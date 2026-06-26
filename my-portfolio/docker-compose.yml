@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:16-alpine
+    container_name: telemetry_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: telemetry_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER}/telemetry-backend:latest
+    container_name: telemetry_backend
+    restart: always
+    depends_on:
+      - database
+    environment:
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@database:5432/telemetry_db?sslmode=disable
+      PORT: 5000
+      CLIENT_URL: https://yourdomain.com
+    ports:
+      - "5000:5000"
+
+  frontend:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER}/telemetry-frontend:latest
+    container_name: telemetry_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
