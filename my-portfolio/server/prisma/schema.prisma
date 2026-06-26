@@ -1,0 +1,22 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model TelemetryLog {
+  id            String   @id @default(uuid())
+  eventVector   String   
+  ipFingerprint String?
+  timestamp     DateTime @default(now())
+}
+
+model SignalTransmission {
+  id          String   @id @default(uuid())
+  originNode  String   
+  payload     String   
+  receivedAt  DateTime @default(now())
+}
